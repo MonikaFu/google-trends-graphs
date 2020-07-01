@@ -1,0 +1,5 @@
+data/
+report/
+.ipynb_checkpoints
+settings.py
+__pycache__
