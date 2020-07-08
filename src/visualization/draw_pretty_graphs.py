@@ -8,6 +8,7 @@ Created on Fri May  8 09:15:14 2020
 import matplotlib.pyplot as P#, matplotlib.patches as MP
 import datetime as dt
 import pandas as pd
+import numpy as np
 
 df_colors_light = pd.DataFrame([[140, 140, 140],[136, 189, 230],[251,178,88],[144,205,151],
                                 [246,170,201],[191,165,84],[188,153,199],[237,221,70],
@@ -74,35 +75,51 @@ def draw_pretty_graph_timeseries_lines(data, timeseries_label, xlabel, ylabel):
         axes.yaxis.set_label_coords(-0.075,0.5)
         
         
-        def add_corrected_labels_locations(text_y_locations_dict,idx,curr_y,offset):
-            if not text_y_locations_dict:
-                text_y_locations_dict[idx] = curr_y
-            else:
-                test_list = [abs(curr_y - dict_y)<2.5 for dict_y in text_y_locations_dict.values()]
-                if not any(test_list):
-                    text_y_locations_dict[idx] = curr_y
-                else:
-                    close_key = [key for i,(key,val) in enumerate(text_y_locations_dict.items()) if abs(curr_y - val)<2.5]    
-                    for key in close_key:
-                        if text_y_locations_dict[key] > curr_y:
-                            text_y_locations_dict[key] += offset
-                            curr_y -= offset
-                        else:
-                            text_y_locations_dict[key] -= offset
-                            curr_y += offset
-                    text_y_locations_dict[idx] = curr_y
-            return text_y_locations_dict
+        def correct_labels_locations(text_y_locations_dict,offset):
+            text_y_locations_dict_corrected = text_y_locations_dict.copy()
+            dict_keys = [key for i,(key,val) in enumerate(text_y_locations_dict.items())]
+            dict_vals = [val for i,(key,val) in enumerate(text_y_locations_dict.items())]
+            
+            idx_sorted_vals = np.argsort(dict_vals)
+            sort_dict_vals = np.sort(dict_vals)
+            sort_dict_keys = [dict_keys[i] for i in idx_sorted_vals]
+            
+            test_closeness = [abs(sort_dict_vals[1:] - sort_dict_vals[0:-1])<(offset + 0.1)]
+            if np.any(test_closeness):
+                close_val_list = []
+                close_key_list = []
+                close_idx = []
+                for i in range(0,len(sort_dict_vals)-1):
+                    if (abs(sort_dict_vals[i+1] - sort_dict_vals[i]) < (offset + 0.1)):
+                        if not (i in close_idx):
+                            close_val_list.append(sort_dict_vals[i])
+                            close_key_list.append(sort_dict_keys[i])
+                            close_idx.append(i)
+                        close_val_list.append(sort_dict_vals[i+1])
+                        close_key_list.append(sort_dict_keys[i+1])
+                        close_idx.append(i+1)
+                nr_keys = len(close_val_list)
+                spread = close_val_list[-1] - close_val_list[0]
+                middle = close_val_list[0] + spread/2
+                new_val_list = []
+                if nr_keys % 2 == 0:
+                    for i in range(1,int(nr_keys/2)+1):
+                        new_val_list.insert(0,middle - i*0.5*offset)
+                        new_val_list.append(middle + i*0.5*offset)
+                if nr_keys % 2 == 1:
+                    new_val_list.append(middle)
+                    for i in range(1, int(nr_keys/2)+1):
+                        new_val_list.insert(0, middle - i*offset)
+                        new_val_list.append(middle + i*offset)
+                
+                for i,key in enumerate(close_key_list):
+                    text_y_locations_dict_corrected[key] = new_val_list[i]
+            return text_y_locations_dict_corrected
         
-        # annotate labels next to the lines instead of legend
         text_y_locations_dict = {}
-        text_y_locations_dict_new = {}
-        iterations = 0
         for i in range(1,len(data.columns)):
-            text_y_locations_dict_new = add_corrected_labels_locations(text_y_locations_dict,i,data.iloc[-1,i],1.5)
-            while (text_y_locations_dict_new != text_y_locations_dict) & (iterations < 20):
-                text_y_locations_dict = text_y_locations_dict_new
-                text_y_locations_dict_new = add_corrected_labels_locations(text_y_locations_dict,i,data.iloc[-1,i],1.5)
-                iterations += 1
+            text_y_locations_dict[i] = data.iloc[-1,i]
+        text_y_locations_dict = correct_labels_locations(text_y_locations_dict, offset = 4) 
             
         for i in range(1,len(data.columns)):
             dataxy = (data[timeseries_label].iloc[-1],data.iloc[-1,i])
