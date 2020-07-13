@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 """
+Library with data processing function.
+
+Converts the .csv data files dowloaded from the Google Tredns platform into a dataframe that can be processed by the data 
+visualization functions.
 Created on Wed May 13 16:25:04 2020
 
 @author: MonikaFurdyna

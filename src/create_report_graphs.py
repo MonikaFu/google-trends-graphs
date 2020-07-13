@@ -1,10 +1,12 @@
 # -*- coding: utf-8 -*-
 """
+Script for creating Google Trends data visualizations
+
 Created on Thu May  7 13:51:34 2020
 
 @author: MonikaFurdyna
 """
-
+# import path to the code on your computer
 from settings import path 
 
 import os
@@ -19,6 +21,7 @@ import matplotlib.pyplot as plt
 
 os.chdir(path)
 
+# the names of the data files that you want to plot
 name_common = 'multiTimeline_'
 
 name_categories = ['Climate','Climate_topics','Education_Online','Energy_topics',
@@ -34,8 +37,8 @@ for cat in name_categories:
         fig = draw_pretty_covid_graph_world(data, climate=True)
     else:
         fig = draw_pretty_covid_graph_world(data)
-    #plt.savefig('../../report/figures/'+'searches_over_time_'+cat+'.svg', bbox_inches='tight') # higher quality
-    plt.savefig('../report/figures_report/'+'searches_over_time_'+cat+'.png', bbox_inches='tight')
+    plt.savefig('../report/figures_report/'+'searches_over_time_'+cat+'.svg', bbox_inches='tight') # higher quality
+    #plt.savefig('../report/figures_report/'+'searches_over_time_'+cat+'.png', bbox_inches='tight')
     
     plt.show()
         
