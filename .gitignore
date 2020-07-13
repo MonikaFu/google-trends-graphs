@@ -3,3 +3,4 @@ report/
 .ipynb_checkpoints
 settings.py
 __pycache__
+.png
