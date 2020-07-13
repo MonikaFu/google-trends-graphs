@@ -204,13 +204,13 @@ def draw_pretty_covid_graph_nl(data):
     
     return fig
 
-def draw_pretty_covid_graph_world(data, climate=False):
+def draw_pretty_covid_graph_world(data, label,climate=False):
     """
     Function plotting the time series of Google Trends data and annotating it with the Corona events relevant for the world
     """
     
     draw_pretty_graph_timeseries_lines(data, 'Week', 'Week (start date)', 'Relative \n number \n of searches')
-
+    
     # annotate points
     idx_first_case = data.index[data.Week==dt.datetime.strptime('2019-12-29','%Y-%m-%d')] #31st December
     dataxy = (data.Week[idx_first_case],0)
@@ -234,12 +234,19 @@ def draw_pretty_covid_graph_world(data, climate=False):
                arrowprops={'arrowstyle': '-','color':'silver'},annotation_clip=False)
     
     if climate:
+        # add a title to the graphs
+        P.suptitle('Normalized worldwide Google search volumes over time related to ' + '\''+ label.replace('_',' ') + '\'', y = 1.45)
+
         idx = data.index[data.Week==dt.datetime.strptime('2019-09-22','%Y-%m-%d')] #23th September
         dataxy = (data.Week[idx],0)
         textxy = (data.Week[idx],143)
         P.annotate('Greta  Thunberg \n speech',dataxy,textxy,
                    verticalalignment='center',horizontalalignment='center', color = 'dimgrey',
                    arrowprops={'arrowstyle': '-','color':'silver'},annotation_clip=False)
+    else:
+        # add a title to the graphs
+        P.suptitle('Normalized worldwide Google search volumes over time related to ' + '\''+ label.replace('_',' ') + '\'', y = 1.35)
+
  
     fig = P.gcf()
         
